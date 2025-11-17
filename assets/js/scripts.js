@@ -1,5 +1,5 @@
 import { data } from "./data.js";
-import {  toMinAndSec } from "./utils.js";// 35:00 Импортируем функцию из файла utils.js
+import {  shuffle, toMinAndSec } from "./utils.js";// 35:00 Импортируем функцию из файла utils.js
 
 // console.log(data);//Вывод в консоле
 
@@ -7,12 +7,14 @@ const AudioController = {
   //Создаём изначально пустой массив 27:40
   state: {
     audios: [],  
-  //current отклик renderCurrentItem 41:13
-  current: {},
-    //1:11:52
+    //current отклик renderCurrentItem 41:13
+    current: {},
+    //1:11:50
     repeating: false,
     //53:20
     playing: false,
+    // 1:14:12
+    volume: 0.5,
   },
   //Вызываем функцию init для блока items, чтобы работат с нашими аудио треками. Нам надо здесь их отобразить.
   init() {
@@ -29,16 +31,48 @@ const AudioController = {
     this.currentItem = document.querySelector(".current");
     //Добавляем handling-repeat 1:11:11
     this.repeatButton = document.querySelector(".handling-repeat");
+    //Добавляем controls-volume 1:13:52
+    this.volumeButton = document.querySelector(".controls-volume");
+    //1:16:20 Эта строка находит и сохраняет кнопку перемешивания треков в твоём плеере! 🔀
+    this.shuffleButton = document.querySelector(".handling-shuffle");
   }, 
 
-  //Добавляем событие клика для item-a 38:55
+  //Добавляем событие клика для item-a. Блок полноценный музыкальный центр! 🎵 38:55
   initEvents() {
     this.audioList.addEventListener("click", this.handleItem.bind(this));
-    //Добавляем клик handling-repeat 1:11:11
+    //Добавляем клик handling-repeat(повтор трека/плейлиста) 1:11:11
+    this.repeatButton.addEventListener("click", this.handleRepeat.bind(this));
+    //Добавляем клик controls-volume 1:14:12
+    this.volumeButton.addEventListener("change", this.handleVolume.bind(this));
+    //Добавляем клик перемешивание треков 1:16:36
     this.shuffleButton.addEventListener("click", this.handleShuffle.bind(this));
   },
 
-  //1:11:52
+  // 1:16:48 сама функция в utils.js
+  handleShuffle() {
+    const { children } = this.audioList;// 1. Берём все элементы списка
+    const shuffled = shuffle([...children]);// 2. Перемешиваем их    
+    this.audioList.innerHTML = "";// 3. Очищаем контейнер
+    shuffled.forEach((item) => this.audioList.appendChild(item));// 4. Вставляем в новом порядке
+
+    // Добавь это для индикации: ИИ
+    this.state.shuffling = !this.state.shuffling;
+    console.log('Shuffle включен:', this.state.shuffling); // ← вот это!
+    this.shuffleButton.classList.toggle("active", this.state.shuffling);
+    /*/ Временно для теста
+    this.shuffleButton.style.backgroundColor = this.state.shuffling ? '#4a90e2' : 'transparent';
+    this.shuffleButton.style.border = this.state.shuffling ? '2px solid white' : 'none'; // ← рамка*/
+  },
+
+  // 1:15:00 Этот блок кода обрабатывает изменение громкости через ползунок! 🎛️→🔊
+  handleVolume({ target: { value } }) {
+    const { current } = this.state;// - получаем текущий трек
+    this.state.volume = value;// - сохраняем новое значение громкости в состоянии плеера
+    if (!current?.audio) return;// - проверяем: Есть ли текущий трек? Есть ли у него аудио-элемент? Если нет - выходим из функции
+    current.audio.volume = value;// - применяем громкость к аудио-элементу
+  },
+
+  //1:11:50
   handleRepeat({ currentTarget }) {
     const { repeating } = this.state;
 
@@ -248,6 +282,9 @@ const AudioController = {
     this.state.current = current;
     //Вместе они переключатель. Нажимая на нижние, верху появляется нажатый нижний. 46:40    
     this.currentItem.innerHTML = this.renderCurrentItem(current);
+
+    // 1:15:40 Эта строка устанавливает громкость аудиоплеера.🎛️→🔊
+    current.audio.volume = this.state.volume;
 
     //Вызываем функцию 56:16
     this.handlePlayer();

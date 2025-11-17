@@ -10,3 +10,6 @@ export const toMinAndSec = (duration) => {
   //Оператор return завершает выполнение текущей функции и возвращает её значение.
   return `${minutes}:${seconds}`;
 };
+
+// 1:16:48 handleShuffle() в scripts.js
+export const shuffle = (array) => array.sort(() => 0.5 - Math.random());
