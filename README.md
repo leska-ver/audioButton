@@ -6,8 +6,8 @@
 1. Создала папку audioButton - > В неё скачала её папку assets и создала файл index.html(по видео)<br>
 2. Взяли шрифт - https://fonts.google.com/specimen/Ubuntu?query=ubuntu и подключили в index.html<br>
 3. Подключили в index.html:<br>
- - <link rel="stylesheet" href="./assets/scss/reset.css"><br>
- - <link rel="stylesheet" href="./assets/scss/style.css"><br>
+ - `<link rel="stylesheet" href="./assets/scss/reset.css"><br>`
+ - `<link rel="stylesheet" href="./assets/scss/style.css"><br>`
  
  ## --19:25 - JS--
  1. Создаём папку JS -> В ней создали файл data.js(файл с нашими данными), из неё мы ничего не будем получать. Типа инфы о каждой песни.<br> 
