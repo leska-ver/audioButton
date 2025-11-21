@@ -72,17 +72,21 @@ https://codepen.io/tmeebphp-the-sans/pen/KwzXmRK?editors=0010
 ### В обычном проекте:
 
 ### В обычном проекте:
-```ваш-проект/ 
-├── index.html 
-├── assets/ 
-│   └── img/ 
-│       └── kino.jpg    ← путь ./assets/img/kino.jpg работает 
-└── script.js```
+```text
+ваш-проект/
+├── index.html
+├── assets/
+│   └── img/
+│       └── kino.jpg    ← путь ./assets/img/kino.jpg работает
+└── script.js
+```
 
 ### В CodePen:
-```codepen-виртуальный-сервер/ 
-├── ваш-код (в одном файле) 
-└── НЕТ папки assets/img/ !``` 
+```text
+codepen-виртуальный-сервер/
+├── ваш-код (в одном файле)
+└── НЕТ папки assets/img/ !
+```
 
 ### Почему в CodePen нужно иначе:
 1. Относительные пути не работают
