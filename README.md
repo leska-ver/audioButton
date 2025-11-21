@@ -85,12 +85,21 @@ Touch-дружественные элементы
 <p>CodePen не дает загружать локальные файлы изображений</p>
 
 2. Решения в CodePen:
-<p>Вариант A: Использовать абсолютные URL с CDN</p>
-`<i>// Вместо ./assets/img/kino.jpg</i>
-return `<div style="background-image: url(https://my-cdn.com/img/${img}.jpg)"></div>``
-<p>Вариант B: Заранее загрузить изображения в CodePen Assets</p>
-`<i>// CodePen сам генерирует URL<i>
-return `<div style="background-image: url(https://assets.codepen.io/your-image.jpg)"></div>``
-<p>Вариант C: Использовать внешние сервисы (как picsum.photos)</p>
-`<i>// Для тестовых/случайных изображений</i>
-return `<div style="background-image: url(https://picsum.photos/200/200)"></div>``
+
+### Вариант A: Использовать абсолютные URL с CDN
+```javascript
+// Вместо ./assets/img/kino.jpg
+return `<div style="background-image: url(https://my-cdn.com/img/${img}.jpg)"></div>`
+```
+
+### Вариант B: Заранее загрузить изображения в CodePen Assets
+```javascript
+// CodePen сам генерирует URL
+return `<div style="background-image: url(https://assets.codepen.io/your-image.jpg)"></div>`
+```
+
+### Вариант C: Использовать внешние сервисы (как picsum.photos)
+```javascript
+// Для тестовых/случайных изображений
+return `<div style="background-image: url(https://picsum.photos/200/200)"></div>`
+```
