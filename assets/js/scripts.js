@@ -9,12 +9,15 @@ const AudioController = {
     audios: [],  
     //current отклик renderCurrentItem 41:13
     current: {},
-    //1:11:50
-    repeating: false,
+    //1:11:50 В моей доработке она не нужна
+    // repeating: false,
     //53:20
     playing: false,
     // 1:14:12
     volume: 0.5,
+    // Добавила индикации режима повтора! «От себятина»
+    repeatMode: 0, // ← 0=выкл, 1=+1 раз, 2=+2 раза, 3=∞
+    repeatRemaining: 0, // ← счётчик оставшихся повторений
   },
   //Вызываем функцию init для блока items, чтобы работат с нашими аудио треками. Нам надо здесь их отобразить.
   init() {
@@ -22,6 +25,20 @@ const AudioController = {
     //Реализовываем событие initEvents 38:55
     this.initEvents();
     this.renderAudios();
+
+    // === Загружаем Playlist Saving (сохранение состояния): === «От себятина»
+    const saved = JSON.parse(localStorage.getItem('musicPlayerState'));
+    if (saved) {
+      this.state.volume = saved.volume;
+      this.volumeButton.value = saved.volume;
+      
+      if (saved.currentTrack) {
+        // Просто загружаем состояние, но не играем
+        this.state.currentTrackId = saved.currentTrack;
+        // Пользователь сам кликнет на трек когда захочет
+      }
+    }
+    // === КОНЕЦ ДОБАВЛЕНИЯ ===
   },
 
   initVariables() {
@@ -46,9 +63,32 @@ const AudioController = {
     this.volumeButton.addEventListener("change", this.handleVolume.bind(this));
     //Добавляем клик перемешивание треков 1:16:36
     this.shuffleButton.addEventListener("click", this.handleShuffle.bind(this));
+
+    // === Управление с клавиатуры === «От себятина»
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        this.handleAudioPlay();
+      } else if (e.code === 'ArrowRight') {
+        this.handleNext();
+      } else if (e.code === 'ArrowLeft') {
+        this.handlePrev();
+      }
+    });
+    // === КОНЕЦ ДОБАВЛЕНИЯ ===
   },
 
-  // 1:16:48 сама функция в utils.js
+  // === Функция сохранения состояния === «От себятина»
+  saveState() {
+    localStorage.setItem('musicPlayerState', JSON.stringify({
+      currentTrack: this.state.current?.id,
+      volume: this.state.volume,
+      playing: this.state.playing
+    }));
+  },
+  // === КОНЕЦ ДОБАВЛЕНИЯ ===
+
+  /*/ 1:16:48 сама функция в utils.js
   handleShuffle() {
     const { children } = this.audioList;// 1. Берём все элементы списка
     const shuffled = shuffle([...children]);// 2. Перемешиваем их    
@@ -58,10 +98,45 @@ const AudioController = {
     // Добавь это для индикации: ИИ
     this.state.shuffling = !this.state.shuffling;
     console.log('Shuffle включен:', this.state.shuffling); // ← вот это!
-    this.shuffleButton.classList.toggle("active", this.state.shuffling);
+    this.shuffleButton.classList.toggle("active", this.state.shuffling);*/
     /*/ Временно для теста
     this.shuffleButton.style.backgroundColor = this.state.shuffling ? '#4a90e2' : 'transparent';
     this.shuffleButton.style.border = this.state.shuffling ? '2px solid white' : 'none'; // ← рамка*/
+  /*},*/
+
+  handleShuffle() {
+    // Сохраняем текущий трек
+    const currentId = this.state.current?.id;
+    
+    const { children } = this.audioList;
+    const shuffled = shuffle([...children]);   
+    this.audioList.innerHTML = "";
+    shuffled.forEach((item) => this.audioList.appendChild(item));
+  
+    // ИСПРАВЛЕНИЕ: Перемешиваем массив audios в том же порядке
+    const shuffledAudios = [];
+    const items = this.audioList.querySelectorAll('.item');
+    
+    items.forEach(item => {
+      const id = parseInt(item.dataset.id);
+      const audio = this.state.audios.find(a => a.id === id);
+      if (audio) shuffledAudios.push(audio);
+    });
+    
+    this.state.audios = shuffledAudios;
+    
+    // Восстанавливаем текущий трек если он был
+    if (currentId) {
+      const currentAudio = this.state.audios.find(a => a.id === currentId);
+      if (currentAudio) {
+        this.state.current = currentAudio;
+      }
+    }
+  
+    this.state.shuffling = !this.state.shuffling;
+    this.shuffleButton.classList.toggle("active", this.state.shuffling);
+    
+    console.log('Shuffle применён, новый порядок треков:', this.state.audios.map(a => a.track));
   },
 
   // 1:15:00 Этот блок кода обрабатывает изменение громкости через ползунок! 🎛️→🔊
@@ -70,15 +145,61 @@ const AudioController = {
     this.state.volume = value;// - сохраняем новое значение громкости в состоянии плеера
     if (!current?.audio) return;// - проверяем: Есть ли текущий трек? Есть ли у него аудио-элемент? Если нет - выходим из функции
     current.audio.volume = value;// - применяем громкость к аудио-элементу
+
+    this.saveState(); // Сохраняем громкость. «От себятина»
   },
 
   //1:11:50
-  handleRepeat({ currentTarget }) {
+  /*handleRepeat({ currentTarget }) {
     const { repeating } = this.state;
 
     //classList меняем на класс active
     currentTarget.classList.toggle("active", !repeating);
     this.state.repeating = !repeating;
+  },*/
+
+  // Добавила индикации режима повтора! «От себятина»
+  handleRepeat({ currentTarget }) {
+    // === ДОБАВИЛА ПРОВЕРКУ ===
+    // Если нет текущего трека - игнорируем клик
+    if (!this.state.current?.id) {
+      console.log('Сначала выберите трек!');
+      return;
+    }
+    // === КОНЕЦ ПРОВЕРКИ ===
+
+    // Цикл режимов: 0 → 1 → 2 → 3 → 0
+    this.state.repeatMode = (this.state.repeatMode + 1) % 4;
+
+    // Устанавливаем счётчики в зависимости от режима
+    if (this.state.repeatMode === 1) {
+      this.state.repeatRemaining = 1; // +1 дополнительное проигрывание
+    } else if (this.state.repeatMode === 2) {
+      this.state.repeatRemaining = 2; // +2 дополнительных проигрывания
+    } else if (this.state.repeatMode === 3) {
+      this.state.repeatRemaining = Infinity; // бесконечность
+    } else {
+      this.state.repeatRemaining = 0;
+    }
+    
+    // Убираем все классы повторения
+    currentTarget.classList.remove('repeat-one', 'repeat-two', 'repeat-all', 'active');
+    
+    // Добавляем нужный класс в зависимости от режима
+    if (this.state.repeatMode === 1) {
+      currentTarget.classList.add('repeat-one', 'active');
+      currentTarget.setAttribute('data-count', '1'); // ← цифра 1
+    } else if (this.state.repeatMode === 2) {
+      currentTarget.classList.add('repeat-two', 'active');
+      currentTarget.setAttribute('data-count', '2'); // ← цифра 2
+    } else if (this.state.repeatMode === 3) {
+      currentTarget.classList.add('repeat-infinity', 'active');
+      currentTarget.setAttribute('data-count', '∞'); // ← бесконечность
+    } else {
+      currentTarget.removeAttribute('data-count');
+    }
+    
+    console.log(`Режим повтора: ${this.state.repeatMode}, Осталось повторений: ${this.state.repeatRemaining}`);
   },
 
   //Получаем аудио 53:20
@@ -95,7 +216,16 @@ const AudioController = {
 
     // Здесь меняет у кнопки иконки. 55:00 Перенос 1:07:42 в togglePlaying()
     this.playButton.classList.toggle("playing", !playing);
-  },
+
+    // === Обновляем маленькую кнопку текущего трека === «От себятина»
+    const currentItemPlay = document.querySelector(`[data-id="${current.id}"] .item-play`);
+    if (currentItemPlay) {
+      currentItemPlay.classList.toggle('playing', !playing);
+    }
+
+    this.saveState(); // Сохраняем состояние воспроизведения
+    // === КОНЕЦ ДОБАВЛЕНИЯ ===
+    },
 
   // Функция handleNext. Кнопка нажатия следующей песни. Клик правой кнопки. 57:42
   handleNext() {
@@ -154,8 +284,22 @@ const AudioController = {
   audioUpdateHandler({ audio, duration }) { //Дуструктуризация - audio за сунули {} 49:43
     //Ищим .progress-current. Он будет меняться.
     const progress = document.querySelector(".progress-current");
+    const progressBar = progress.parentElement; // сам прогресс-бар «От себятина»
     //Тоже будет меняться. 48:20
     const timeline = document.querySelector(".timeline-start");
+
+    // === Progress Click (перемотка по клику): === «От себятина»
+    progressBar.addEventListener('click', (e) => {
+      const rect = progressBar.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const percent = clickX / rect.width;
+      const newTime = percent * duration;
+      
+      audio.currentTime = newTime;
+      progress.style.width = `${percent * 100}%`;
+      timeline.innerHTML = toMinAndSec(newTime);
+    });
+    // === КОНЕЦ ===
 
     //Заиграет музыка 50:05. Закоментила 51:46
     // audio.play();         
@@ -173,15 +317,49 @@ const AudioController = {
     });
 
 
-    //Когда трек до поёт, заиграет следующий 1:09:55 
+    /*/Когда трек до поёт, заиграет следующий 1:09:55 
     audio.addEventListener("ended", ({ target }) => {
       //Обновляем 0
-      target.currentTime = 0;
+      target.currentTime = 0;*/
+    audio.addEventListener("ended", () => { //«От себятина»
+      //Обновляем 0
+      audio.currentTime = 0;  
       progress.style.width = `0%`;
+
+      console.log(`Трек завершён. Режим: ${this.state.repeatMode}, Осталось: ${this.state.repeatRemaining}`); // ← ДЛЯ ОТЛАДКИ
 
       //Переделали запись 1:13:20
       // this.handleNext();
-      this.state.repeating ? target.play() : this.handleNext();
+      // this.state.repeating ? target.play() : this.handleNext();ЗАМЕНИЛИ. В моей доработке она не нужна
+
+      // === НА ЭТУ НОВУЮ ЛОГИКУ! ИСПОЛЬЗУЙ this.state.repeatMode НАПРЯМУЮ. ===
+      if (this.state.repeatMode === 1 || this.state.repeatMode === 2) {
+
+        console.log(`Осталось повторений: ${this.state.repeatCounter}`); // ← ДЛЯ ОТЛАДКИ
+        
+        if (this.state.repeatRemaining > 0) {
+          this.state.repeatRemaining--;  
+
+          // Обновляем цифру на кнопке
+          this.repeatButton.setAttribute('data-count', (this.state.repeatRemaining + 1).toString());
+          audio.play(); // играем снова
+          console.log(`Повторяем трек. Осталось повторений: ${this.state.repeatRemaining}`);
+        } else {
+          // Повторы закончились - выключаем
+          this.state.repeatMode = 0;
+          this.state.repeatRemaining = 0;
+          this.repeatButton.removeAttribute('data-count');
+          this.repeatButton.classList.remove('active', 'repeat-one', 'repeat-two', 'repeat-all');
+          this.handleNext(); // переходим к следующему треку
+        }
+      } else if (this.state.repeatMode === 3) {
+        // Бесконечный режим - играем снова
+        audio.play();
+      } else {
+        // Без повтора - следующий трек
+        this.handleNext();
+      }
+      // === КОНЕЦ ЗАМЕНЫ ===
     });
   },
 
@@ -239,7 +417,7 @@ const AudioController = {
               </div>`;
   },
 
-  // Ставим пал(чтобы играла одна музыка при переключение аудио) 1:03:55
+  /*/ Ставим пал(чтобы играла одна музыка при переключение аудио) 1:03:55
   pauseCurrentAudio() {
     const {
       current: { audio },
@@ -252,34 +430,60 @@ const AudioController = {
     audio.pause();
     //При включение аудио начнёт сначала
     audio.currentTime = 0;
+  },*/
+
+  // Мой вариант
+  pauseCurrentAudio() {
+    const { current: { audio } } = this.state;
+    if (!audio) return;
+    audio.pause();
+    audio.currentTime = 0;
   },
 
   //Эта функция кнопки будет реагировать на состояние предыдущей кнопки(была на паузе, значит пауза - была воспроизведённой, значит будет воспроизведёная) 1:06:14
   togglePlaying() {
-    const { playing, current } = this.state;
+    const { playing, current } = this.state;// playing должно означать "сейчас играет"
     //Берём аудио из current-a
     const { audio } = current;
 
     // Перенесли из handleAudioPlay() 1:07:42. Если воспроизводится, то и следующая должна воспроизводиться
-    playing ? audio.play() : audio.pause();
+    //playing ? audio.play() : audio.pause();Здесь ошибка
+    // Если НЕ играет - играть, если играет - пауза
+    !playing ? audio.play() : audio.pause();
 
-    //Здесь меняет у кнопки иконки. 55:00. Перенесли из handleAudioPlay() 1:07:42 Если воспроизводится, то и следующая должна воспроизводиться
-    this.playButton.classList.toggle("playing", playing);
+    // ДОБАВЬ ЭТУ СТРОКУ чтобы синхронизировать состояние: Моя «От себятина»
+    this.state.playing = !playing;
+
+    /*/Здесь меняет у кнопки иконки. 55:00. Перенесли из handleAudioPlay() 1:07:42 Если воспроизводится, то и следующая должна воспроизводиться
+    this.playButton.classList.toggle("playing", playing);*/
+
+    // Моя «От себятина». Большая кнопка
+    this.playButton.classList.toggle("playing", !playing); // ← инвертируй!    
   },
 
-  // Функция 41:44
+  // Функция 41:44 Сохранение состояния при переключении трека
   setCurrentItem(itemId) {
     //Осуществляем поиск по нашему аудио
     const current = this.state.audios.find(({ id }) => +id === +itemId);
 
-    // console.log(current);
     //Проверка
     if (!current) return;
 
-    // Вызываем пал 1:03:57
+    // Вызываем пал 1:03:57 Останавливаем текущий трек
     this.pauseCurrentAudio();
 
-    this.state.current = current;
+    // === СБРОС ПОВТОРОВ ПРИ СМЕНЕ ТРЕКА ===
+    this.state.repeatMode = 0;
+    // this.state.repeatCounter = 1;
+    this.state.repeatRemaining = 0;
+    this.repeatButton.removeAttribute('data-count');
+    this.repeatButton.classList.remove('active', 'repeat-one', 'repeat-two', 'repeat-all');
+    // === КОНЕЦ ДОБАВЛЕНИЯ ===
+
+    // СБРАСЫВАЕМ СОСТОЯНИЕ playing «От себятина»
+    this.state.playing = false;  // сначала сбрасываем состояние
+
+    this.state.current = current; // потом устанавливаем новый трек
     //Вместе они переключатель. Нажимая на нижние, верху появляется нажатый нижний. 46:40    
     this.currentItem.innerHTML = this.renderCurrentItem(current);
 
@@ -291,13 +495,31 @@ const AudioController = {
     //Вывод функции. Она будет находит <div class="progress"> 47:38
     this.audioUpdateHandler(current);
 
-    //Прописываем таймаут 1:06:30
+    // === Обновляем иконки ВСЕХ маленьких кнопок === «От себятина»
+    const allItemPlays = document.querySelectorAll('.item-play');
+    allItemPlays.forEach(btn => btn.classList.remove('playing'));
+    
+    // Для текущего трека добавляем playing
+    const currentItemPlay = document.querySelector(`[data-id="${itemId}"] .item-play`);
+    if (currentItemPlay) {
+      currentItemPlay.classList.add('playing');
+    }
+    // === КОНЕЦ ДОБАВЛЕНИЯ ===
+
+    // Запускаем воспроизведение «От себятина»
+    current.audio.play();
+    this.state.playing = true;
+    this.playButton.classList.add("playing");
+
+    /*/Прописываем таймаут 1:06:30 Этот блок не нужен в моём варианте
     setTimeout(() => {
       this.togglePlaying();
-    }, 5) //10 секунд;
+    }, 5) //10 секунд;*/
+
+    this.saveState(); //ВЫЗОВ функции! «От себятина»    
   },
 
-  //Функция
+  /*/Функция
   handleItem({ target }) {
     //console.log(target); 40:14
 
@@ -307,6 +529,31 @@ const AudioController = {
     if (!id) return;
 
     // Отдаём id 41:44
+    this.setCurrentItem(id);
+  },*/
+
+  // Моя переделка функции. Теперь кнопка play(маленькая) будет включать музыку!
+  handleItem({ target }) {
+    //console.log(target); 40:14
+
+    // Ищем ближайший родительский элемент с data-id (исправление!)
+    const item = target.closest('[data-id]');
+    
+    if (!item) return;
+
+    //Получаем id 40:32 
+    const { id } = item.dataset; // ← поменял target на item!
+    // if (!id) return;
+
+    // === ДОБАВЬ ЭТУ ПРОВЕРКУ === «От себятина»
+    // Если кликаем на текущий уже играющий трек - ставим паузу/продолжаем
+    if (this.state.current?.id?.toString() === id) {
+      this.handleAudioPlay(); // используем ту же логику что и для большой кнопки
+      return;
+    }
+    // === КОНЕЦ ДОБАВЛЕНИЯ ===
+
+    // Отдаём id 41:44 Если кликаем на другой трек - переключаемся
     this.setCurrentItem(id);
   },
 

@@ -64,11 +64,11 @@ svg {
   justify-content: space-between;
 }
 .current-info__track {
+  margin-top: 2px;
   font-weight: 700;
   font-size: 24px;
   line-height: 28px;
   color: #ffffff;
-  margin-top: 2px;
 }
 .current-info__group {
   font-weight: 400;
@@ -157,10 +157,10 @@ svg {
 }
 
 .timeline {
-  margin-top: 4px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: 4px;
 }
 .timeline span {
   font-weight: 400;
@@ -294,6 +294,61 @@ svg {
   cursor: pointer;
 }/*# sourceMappingURL=style.css.map */
 
+/* Индикации режима повтора! «От себятина» */
+.repeat-counter {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ff874a;
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Индикатор счётчика повтора */
+.handling-repeat {
+  position: relative; 
+}
+
+.handling-repeat.repeat-one .repeat-counter {
+  display: flex;
+}
+
+/* Индикатор счётчика повтора */
+.handling-repeat.active::after {
+  content: attr(data-count);
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  color: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #fff;
+  z-index: 10;/* ← Покажет индикатор повтора */
+}
+
+.handling-repeat.repeat-two.active::after {
+  /* Можно добавить особые стили для режима "2 раза" */
+  border: 1px solid #ff5500; /* например, другой цвет */
+  color: #ff5500; /* например, другой цвет */
+}
+
+/* Для бесконечности немного другой стиль */
+.handling-repeat.repeat-all::after {
+  font-size: 10px;
+  padding-bottom: 1px;
+}
 
 /* Или добавить эффект "горения" от ИИ*/
 .handling-shuffle.active {
@@ -304,4 +359,20 @@ svg {
   0% { opacity: 1; }
   50% { opacity: 0.7; }
   100% { opacity: 1; }
+}
+
+/* Стили для смены иконок маленьких кнопок «От себятина»*/
+.item-play.playing .icon-play {
+  display: none;
+}
+
+.item-play.playing::after {
+  content: '| |';
+  padding: 9px 11px;
+  border-radius: 50%;
+  border: 1.8px solid #ff874a;
+  font-size: 12px;
+  font-weight: 500;
+  color: #ff874a;
+  background-color: transparent;
 }
