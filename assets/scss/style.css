@@ -294,6 +294,7 @@ svg {
   cursor: pointer;
 }/*# sourceMappingURL=style.css.map */
 
+
 /* Индикации режима повтора! «От себятина» */
 .repeat-counter {
   position: absolute;
@@ -319,7 +320,6 @@ svg {
   display: flex;
 }
 
-/* Индикатор счётчика повтора */
 .handling-repeat.active::after {
   content: attr(data-count);
   position: absolute;

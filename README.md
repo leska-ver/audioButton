@@ -1,4 +1,7 @@
-# Видео урок
+# Мой сайт
+https://leska-ver.github.io/audioButton/
+
+## Видео урок
 https://www.youtube.com/watch?v=oFB0HBmyCtI
 
 ## Автора репозиторий с готовым кодом и файлами:
@@ -19,8 +22,11 @@ https://github.com/tomkovich/js/tree/master/spotimy
 ## JS (33:00)
 1. Создаём файл utils.js. В ней будет создана вспомогательная функция которая будет превращать наши миллисекунды в секунды и минуты.
 
-## В style.css
-- Добавила свои стили .handling-shuffle.active
+## В style.css Добавила свои стили:
+- Индикации режима повтора!
+- Индикатор счётчика повтора!
+- Стили для смены иконок маленьких кнопок!
+- Сцффле .handling-shuffle.active
 
 ---
 
