@@ -24,7 +24,7 @@ https://github.com/tomkovich/js/tree/master/spotimy
 
 ---
 
-# 🎯 Что вы добавили в её плеер (чего не было изначально):
+# 🎯 Что я добавила в её плеер (чего не было изначально):
 
 ## 🎵 Управление воспроизведением:
 - Клавиатурные shortcuts (Space, стрелки, цифры)
@@ -72,17 +72,17 @@ https://codepen.io/tmeebphp-the-sans/pen/KwzXmRK?editors=0010
 ### В обычном проекте:
 
 ### В обычном проекте:
-`ваш-проект/<br> 
-├── index.html<br> 
-├── assets/<br> 
-│   └── img/<br> 
-│       └── kino.jpg    ← путь ./assets/img/kino.jpg работает<br> 
-└── script.js`
+```ваш-проект/ 
+├── index.html 
+├── assets/ 
+│   └── img/ 
+│       └── kino.jpg    ← путь ./assets/img/kino.jpg работает 
+└── script.js```
 
 ### В CodePen:
-`codepen-виртуальный-сервер/<br> 
-├── ваш-код (в одном файле)<br> 
-└── НЕТ папки assets/img/ !`<br> 
+```codepen-виртуальный-сервер/ 
+├── ваш-код (в одном файле) 
+└── НЕТ папки assets/img/ !``` 
 
 ### Почему в CodePen нужно иначе:
 1. Относительные пути не работают
