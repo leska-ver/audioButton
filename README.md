@@ -69,18 +69,18 @@ Touch-дружественные элементы
 <p>В <b>CodePen</b> код работает иначе из-за особенностей его архитектуры.</p>
 <br>
 
-## Ссылка на кодепен: https://codepen.io/tmeebphp-the-sans/pen/KwzXmRK?editors=0010 
+## Ссылка на кодепен: 
+- https://codepen.io/tmeebphp-the-sans/pen/KwzXmRK?editors=0010 
 <br> 
 
 <h3>Главная причина: Разные структуры проектов</h3>
-<br>
 
 ### В обычном проекте:
-`ваш-проект/
-├── index.html
-├── assets/
-│   └── img/
-│       └── kino.jpg    ← путь ./assets/img/kino.jpg работает
+`ваш-проект/<br> 
+├── index.html<br> 
+├── assets/<br> 
+│   └── img/<br> 
+│       └── kino.jpg    ← путь ./assets/img/kino.jpg работает<br> 
 └── script.js`
 <br>
 
