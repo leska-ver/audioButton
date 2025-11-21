@@ -76,8 +76,6 @@ https://codepen.io/tmeebphp-the-sans/pen/KwzXmRK?editors=0010
 ## Главная причина: Разные структуры проектов
 
 ### В обычном проекте:
-
-### В обычном проекте:
 ```text
 ваш-проект/
 ├── index.html
