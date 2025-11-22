@@ -338,10 +338,14 @@ const AudioController = {
         console.log(`Осталось повторений: ${this.state.repeatCounter}`); // ← ДЛЯ ОТЛАДКИ
         
         if (this.state.repeatRemaining > 0) {
-          this.state.repeatRemaining--;  
+          this.state.repeatRemaining--; //уменьшаем счётчик ПЕРЕД воспроизведением  
 
           // Обновляем цифру на кнопке
-          this.repeatButton.setAttribute('data-count', (this.state.repeatRemaining + 1).toString());
+          if (this.state.repeatRemaining > 0) {
+            this.repeatButton.setAttribute('data-count', this.state.repeatRemaining.toString());
+          } else {
+            this.repeatButton.removeAttribute('data-count'); // убираем цифру
+          }
           audio.play(); // играем снова
           console.log(`Повторяем трек. Осталось повторений: ${this.state.repeatRemaining}`);
         } else {

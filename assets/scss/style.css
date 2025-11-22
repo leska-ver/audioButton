@@ -5,21 +5,21 @@ body {
 }
 
 .root {
-  width: 100vw;
-  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  width: 100vw;
+  height: 100vh;
 }
 
 .app {
-  background: linear-gradient(180deg, #6192c4 0%, #07386b 100%);
-  border-radius: 12px;
-  padding: 24px 25px;
   margin-top: 34px;
+  padding: 24px 25px;
+  border-radius: 12px;
   width: 90vw;
   max-width: 614px;
+  background: linear-gradient(180deg, #6192c4 0%, #07386b 100%);
 }
 
 h1 {
@@ -47,17 +47,17 @@ svg {
        column-gap: 12px;
 }
 .current-image {
+  border-radius: 12px;
+  width: 150px;
+  height: 150px;
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  width: 150px;
-  height: 150px;
-  border-radius: 12px;
 }
 .current-info {
-  flex-grow: 1;
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
 }
 .current-info__top {
   display: flex;
@@ -65,20 +65,20 @@ svg {
 }
 .current-info__track {
   margin-top: 2px;
-  font-weight: 700;
   font-size: 24px;
+  font-weight: 700;
   line-height: 28px;
   color: #ffffff;
 }
 .current-info__group {
-  font-weight: 400;
   font-size: 14px;
+  font-weight: 400;
   line-height: 16px;
   color: #dbf2db;
 }
 .current-info__year {
-  font-weight: 400;
   font-size: 12px;
+  font-weight: 400;
   line-height: 14px;
   color: #dbf2db;
 }
@@ -90,17 +90,17 @@ svg {
   fill: #ff874a;
 }
 .controls .icon-pause {
-  fill: none;
-  stroke: #ff874a;
   display: none;
   width: 40px;
   height: 40px;
+  fill: none;
+  stroke: #ff874a;
 }
 .controls .icon-play {
-  fill: #ff874a;
   display: block;
   width: 40px;
   height: 40px;
+  fill: #ff874a;
 }
 .controls svg {
   cursor: pointer;
@@ -140,20 +140,20 @@ svg {
 }
 
 .progress {
+  position: relative;
+  border-radius: 12px;
   width: 100%;
   height: 2px;
-  position: relative;
   background: #dbf2db;
-  border-radius: 12px;
   overflow: hidden;
 }
 .progress-current {
-  background: #ff874a;
-  border-radius: 12px;
   position: absolute;
   top: 0;
   left: 0;
+  border-radius: 12px;
   height: 100%;
+  background: #ff874a;
 }
 
 .timeline {
@@ -163,15 +163,15 @@ svg {
   margin-top: 4px;
 }
 .timeline span {
-  font-weight: 400;
   font-size: 12px;
+  font-weight: 400;
   line-height: 14px;
   color: rgba(255, 255, 255, 0.5);
 }
 
 .list-title {
-  font-weight: 400;
   font-size: 22px;
+  font-weight: 400;
   line-height: 25px;
   color: #dbf2db;
 }
@@ -184,26 +184,26 @@ svg {
 }
 
 .item {
+  position: relative;
   display: grid;
   grid-template-columns: 48px 3fr 2fr 2fr auto;
   align-items: center;
-  position: relative;
 }
 .item:hover svg {
   transform: rotate(360deg);
 }
 .item:before {
   content: "";
-  display: block;
   position: absolute;
+  display: block;
   width: 100%;
   height: 100%;
   cursor: pointer;
   z-index: 1;
 }
 .item p {
-  font-weight: 400;
   font-size: 12px;
+  font-weight: 400;
   line-height: 14px;
   color: rgba(255, 255, 255, 0.5);
   text-transform: capitalize;
@@ -217,16 +217,16 @@ svg {
   background-position: center;
 }
 .item-group {
-  font-weight: 400;
   font-size: 12px;
+  font-weight: 400;
   line-height: 14px;
   color: #dbf2db;
 }
 .item-track {
+  margin-top: 2px;
   font-weight: 500;
   line-height: 18px;
   color: #ffffff;
-  margin-top: 2px;
 }
 .item-titles {
   margin-left: 10px;
@@ -282,13 +282,13 @@ svg {
 }
 
 .volume {
-  display: none;
   position: absolute;
   left: 0;
   top: 100%;
-  background: #ff874a;
+  display: none;
   padding: 15px;
   border-radius: 6px;
+  background: #ff874a;
 }
 .volume input {
   cursor: pointer;
@@ -300,15 +300,15 @@ svg {
   position: absolute;
   top: -5px;
   right: -5px;
-  background: #ff874a;
-  color: white;
+  display: none;
+  justify-content: center;
+  align-items: center;
   border-radius: 50%;
   width: 16px;
   height: 16px;
   font-size: 10px;
-  display: none;
-  justify-content: center;
-  align-items: center;
+  background: #ff874a;
+  color: white;
 }
 
 /* Индикатор счётчика повтора */
@@ -325,17 +325,48 @@ svg {
   position: absolute;
   top: -8px;
   right: -8px;
-  color: #fff;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: 11px;
-  font-weight: bold;
   display: flex;
   justify-content: center;
   align-items: center;
   border: 1px solid #fff;
+  border-radius: 50%;
+  color: #fff;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  font-weight: bold;
   z-index: 10;/* ← Покажет индикатор повтора */
+}
+
+/* === ИСПРАВЛЕНИЕ ДЛЯ БОРДЕРА ПОВТОРА === */
+/* Бордер показывается ТОЛЬКО когда есть data-count */
+.handling-repeat.active[data-count]::after {
+  content: attr(data-count);
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #fff;
+  z-index: 10;
+}
+
+/* Когда data-count нет - бордера тоже нет */
+.handling-repeat.active:not([data-count])::after {
+  display: none;
+}
+
+/* Для бесконечности немного другой стиль */
+.handling-repeat.repeat-infinity[data-count]::after {
+  font-size: 10px;
+  padding-bottom: 1px;
 }
 
 .handling-repeat.repeat-two.active::after {
@@ -346,8 +377,8 @@ svg {
 
 /* Для бесконечности немного другой стиль */
 .handling-repeat.repeat-all::after {
-  font-size: 10px;
   padding-bottom: 1px;
+  font-size: 10px;
 }
 
 /* Или добавить эффект "горения" от ИИ*/
